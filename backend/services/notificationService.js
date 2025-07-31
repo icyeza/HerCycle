@@ -266,7 +266,8 @@ class NotificationService {
       const userProfile = await UserProfile.findOne({ userId });
       if (!userProfile) return false;
       const daysToPeriod = Math.ceil(
-        (new Date(userProfile.getNextPredictedPeriod()) - new Date()) / (1000 * 60 * 60 * 24)
+        (new Date(userProfile.getNextPredictedPeriod()) - new Date()) /
+          (1000 * 60 * 60 * 24)
       );
 
       // Check if subscription already exists
@@ -286,13 +287,17 @@ class NotificationService {
         });
 
         await userProfile.save();
-        console.log("New ones");
 
         // Send welcome notification
         await this.sendCustomNotification(
           userId,
           "HerCycle Notifications Enabled",
           "You've successfully subscribed to HerCycle notifications. We'll keep you updated!"
+        );
+        await this.sendCustomNotification(
+          userId,
+          "Period Notification",
+          `Your next period is in ${daysToPeriod} days.`
         );
       }
 
