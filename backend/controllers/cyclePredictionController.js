@@ -57,7 +57,7 @@ exports.initializeCycle = async (req, res) => {
     await CycleDay.insertMany(cycleDays);
 
     // Schedule notifications
-    await NotificationService.scheduleNotifications(req.user.id, predictions);
+    // await NotificationService.scheduleNotifications(req.user.id, predictions);
 
     res.json({
       message: "Cycle initialized successfully",
