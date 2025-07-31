@@ -592,7 +592,7 @@ const PeriodTrackerCalendar = () => {
             },
             {
               label: "Days to Period",
-              value: nextPeriodInfo ? `${nextPeriodInfo.daysUntil}` : "—",
+              value: nextPeriodInfo ? `${nextPeriodInfo.daysUntil - 1}` : "—",
               icon: Droplets,
               color: "from-[#f50561] to-pink-500",
             },

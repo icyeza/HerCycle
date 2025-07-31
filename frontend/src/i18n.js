@@ -90,6 +90,7 @@ i18n
           socialConfidence: "High energy and social confidence",
           reflectionTime: "Time for reflection and planning",
           errorOccurred: "An error occurred",
+          dataSaved: "Data Saved"
         },
       },
       fr: {
@@ -180,6 +181,7 @@ i18n
           socialConfidence: "Énergie élevée et confiance sociale",
           reflectionTime: "Temps de réflexion et de planification",
           errorOccurred: "Une erreur s'est produite",
+          dataSaved: "Donnees Sauve"
         },
       },
       ki: {
