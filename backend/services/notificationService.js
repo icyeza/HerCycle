@@ -54,7 +54,7 @@ class NotificationService {
               userId,
               type: "period_reminder",
               title: "🩸 Period Tomorrow",
-              message: `Your period is expected tomorrow. Time to get ready!`,
+              message: `Your period is expected tomorrow. Time to get ready! Grab a pad or painkiller in case.`,
               scheduledFor: new Date(
                 predictionDate.getTime() - 1 * 24 * 60 * 60 * 1000
               ),
@@ -68,7 +68,7 @@ class NotificationService {
             userId,
             type: "period_start",
             title: "🩸 Period Day",
-            message: `Your period is expected to start today. Track it in the app!`,
+            message: `Your period is expected to start today. Track it in the app! Buy pads/tampons and painkillers if needed.`,
             scheduledFor: predictionDate,
             relatedDate: prediction.date,
             confidence: prediction.confidence,
@@ -85,7 +85,7 @@ class NotificationService {
               userId,
               type: "fertile_window",
               title: "💚 High Fertility",
-              message: `You're in your fertile window with high fertility today!`,
+              message: `You're in your fertile window with high fertility today! Remember to buy protection if any activity is planned.`,
               scheduledFor: predictionDate,
               relatedDate: prediction.date,
               confidence: prediction.confidence,
@@ -97,7 +97,7 @@ class NotificationService {
               userId,
               type: "ovulation",
               title: "🌟 Ovulation Day",
-              message: `Today is your predicted ovulation day - peak fertility!`,
+              message: `Today is your predicted ovulation day - peak fertility! Remember to buy protection if any activity is planned.`,
               scheduledFor: predictionDate,
               relatedDate: prediction.date,
               confidence: prediction.confidence,
@@ -183,7 +183,7 @@ class NotificationService {
     try {
       const userId = notification.userId;
       const user = await UserProfile.findOne({ userId });
-      console.log(user)
+      console.log(user);
 
       if (!user.pushSubscriptions || user.pushSubscriptions.length === 0) {
         console.log(`No push subscriptions for user ${user._id}`);
@@ -261,30 +261,33 @@ class NotificationService {
   }
 
   // Subscribe user to push notifications
-// Subscribe user to push notifications
-static async subscribeToPush(userId, subscription) {
+  static async subscribeToPush(userId, subscription) {
     try {
       const userProfile = await UserProfile.findOne({ userId });
       if (!userProfile) return false;
-  
+      const daysToPeriod = Math.ceil(
+        (new Date(userProfile.getNextPredictedPeriod()) - new Date()) / (1000 * 60 * 60 * 24)
+      );
+
       // Check if subscription already exists
       const existingSubscription = userProfile.pushSubscriptions?.find(
         (sub) => sub.endpoint === subscription.endpoint
       );
-  
+
       if (!existingSubscription) {
         if (!userProfile.pushSubscriptions) {
           userProfile.pushSubscriptions = [];
         }
-  
+
         userProfile.pushSubscriptions.push({
           endpoint: subscription.endpoint,
           keys: subscription.keys,
           subscribedAt: new Date(),
         });
-  
+
         await userProfile.save();
-  
+        console.log("New ones");
+
         // Send welcome notification
         await this.sendCustomNotification(
           userId,
@@ -292,14 +295,13 @@ static async subscribeToPush(userId, subscription) {
           "You've successfully subscribed to HerCycle notifications. We'll keep you updated!"
         );
       }
-  
+
       return true;
     } catch (error) {
-      console.error("Error subscribing to push:", error);
+      console.log("Error subscribing to push:", error);
       return false;
     }
   }
-  
 
   // Unsubscribe from push notifications
   static async unsubscribeFromPush(userId, endpoint) {

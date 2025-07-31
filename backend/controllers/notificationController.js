@@ -10,7 +10,6 @@ exports.subscribeToPush = async (req, res) => {
     if (!subscription || !subscription.endpoint) {
       return res.status(400).json({ msg: 'Valid subscription object required' });
     }
-
     const success = await NotificationService.subscribeToPush(req.user.id, subscription);
 
     if (success) {
