@@ -2,6 +2,7 @@ const webpush = require("web-push");
 const CycleDay = require("../models/CycleDay");
 const UserProfile = require("../models/UserProfile");
 const Notification = require("../models/Notification"); // New model needed
+const { getUpcomingPredictions } = require("../controllers/cyclePredictionController");
 
 // Configure web-push (you'll need to generate VAPID keys)
 webpush.setVapidDetails(
@@ -259,16 +260,35 @@ class NotificationService {
       console.error("Error removing invalid subscription:", error);
     }
   }
+  
 
   // Subscribe user to push notifications
   static async subscribeToPush(userId, subscription) {
     try {
+      function daysUntilNextPeriod(nextPeriodRaw) {
+        const msPerDay = 1000 * 60 * 60 * 24;
+        const next = new Date(nextPeriodRaw);
+        if (isNaN(next)) {
+          throw new Error("Invalid next predicted period date");
+        }
+
+        // Option A: exact difference in fractional days, rounding up so any remaining time counts as a full day
+        const now = Date.now();
+        const diffMs = next.getTime() - now;
+        const daysFrac = diffMs / msPerDay;
+        const daysCeil = Math.ceil(daysFrac);
+
+        // Optionally clamp so you don't return negative:
+        return Math.max(0, daysCeil);
+      }
+
       const userProfile = await UserProfile.findOne({ userId });
       if (!userProfile) return false;
-      const daysToPeriod = Math.ceil(
-        (new Date(userProfile.getNextPredictedPeriod()) - new Date()) /
-          (1000 * 60 * 60 * 24)
-      );
+      // const daysToPeriod = Math.ceil(
+      //   (new Date(userProfile.getNextPredictedPeriod()) - new Date()) /
+      //     (1000 * 60 * 60 * 24)
+      // );
+      const daysToPeriod = daysUntilNextPeriod((await getUpcomingPredictions(userId)).nextPeriod.date);
 
       // Check if subscription already exists
       const existingSubscription = userProfile.pushSubscriptions?.find(
