@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Default in Tailwind */
+html {
+    font-size: 16px; /* 1rem = 16px */
+  }
+  
+  /* Accessibility mode */
+  html.accessibility-mode {
+    font-size: 18px; /* 1rem = 18px, increases all text using rem units */
+  }
+  
